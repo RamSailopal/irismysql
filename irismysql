@@ -6,11 +6,11 @@ import string
 
 if (len(sys.argv) < 7):
    print("Parameter 1 - username for mysql, parameter 2 - password for mysql, parameter 3 - host to connect to, parameter 4 - database name, parameter 5 - mysql table name, parameter 6 - Iris instance name, parameter 7 - Iris namespace")
-   sys.exit(0)
+   sys.exit(1)
 
 if (sys.argv[1]==""):
    print("Enter the user name for mysql as the first parameter")
-   sys.exit(0)
+   sys.exit(1)
 
 if (sys.argv[2]==""):
    print("Enter the password for mysql as the second parameter")
@@ -18,24 +18,27 @@ if (sys.argv[2]==""):
 
 if (sys.argv[3]==""):
    print("Enter the mysql host to connect to as a third parameter")
-   sys.exit(0)
+   sys.exit(1)
 
 if (sys.argv[4]==""):
    print("Enter the mysql database to connect to as a fourth parameter")
-   sys.exit(0)
+   sys.exit(1)
 
 if (sys.argv[5]==""):
    print("Enter the mysql table to access as a fifth parameter ")
-   sys.exit(0)
+   sys.exit(1)
 
-if (sys.argv[5]==""):
+if (sys.argv[6]==""):
    print("Enter the IRIS instance name as a sixth parameter")
-   sys.exit(0)
+   sys.exit(1)
 
-if (sys.argv[5]==""):
+if (sys.argv[7]==""):
    print("Enter the IRIS namespace as a seventh parameter")
-   sys.exit(0)
+   sys.exit(1)
 
+#
+#	Strip out any punctuation in the table as IRIS will complain otherwise
+#
 tab=sys.argv[5].translate(None, string.punctuation)
 mydb = mysql.connector.connect(
   host=sys.argv[3],
@@ -58,17 +61,31 @@ for x in mycursor:
   if (x[3]=="PRI"):
      pind=cnt            # Pind tracks which column is the primary key. We can then use this as the global primary subscript.
   cnt=cnt+1
+#
+#	Error and exit if there is no primary key set up
+#
 if (pind==""):
    print("No primary key set up for " + sys.argv[4] + "." + sys.argv[5] + " - ABORTING!")
-   sys.exit(0)
+   sys.exit(1)
 mycursor.execute("SELECT * FROM " + sys.argv[4] + "." + sys.argv[5])
 for x in mycursor:
   for i in range(len(cols)):
      if (i != pind):
+         #
+         # Now generate the objectscript command to create the global entry
+         #
          obcmd="S ^" + str(sys.argv[4]) + "." + str(tab) + "(\"" + str(x[pind]) + "\",\"" + str(cols[i]) + "\")=\"" + str(x[i]) + "\""
-         print(obcmd)
-         process = subprocess.Popen(['iriscmd', 'RAM', 'USER', obcmd],
+         #
+         # Now run the objectscript with iriscmd
+         #
+         process = subprocess.Popen("iriscmd \"" + sys.argv[6] + "\" \"" + sys.argv[7] + "\" \'" + obcmd + "\'",
                      stdout=subprocess.PIPE, 
-                     stderr=subprocess.PIPE)
-         stdout, stderr = process.communicate()
+                     stderr=subprocess.PIPE,
+                     shell=True)
+         resp = process.communicate()
+         if (resp[1] != ""):
+            print("There was an ERROR when running - " + obcmd)
+            sys.exit(1)
+         else:
+            print(obcmd + " - run SUCCESSFULLY")
 
