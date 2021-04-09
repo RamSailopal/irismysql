@@ -56,3 +56,9 @@
 
  IMPORTANT - The utility will abort if there is no primary key assigned to any columns in the table as the primary key will be translated to the primary subscript for the global
        
+ INSTALLATION - Run:
+
+    git clone https://github.com/RamSailopal/irismysql.git
+    mv irismysql/irismysql /usr/local/bin 	
+
+    
