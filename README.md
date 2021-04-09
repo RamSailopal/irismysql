@@ -1,10 +1,10 @@
- AUTHOR - Raman Sailopal
+ <b>AUTHOR<b> - Raman Sailopal
 
  BACKGROUND - Utility to translate mysql tables into IRIS globals
 
  PREREQUISITES - It is assumed that a working version of Intersystems IRIS as well as mysql or mariadb is running
 
-                 It is also assumed that the iriscmd is installed as instructed here - https://github.com/RamSailopal/iriscmd
+ It is also assumed that the iriscmd is installed as instructed here - https://github.com/RamSailopal/iriscmd
 
  PARAMETERS - 
             - 1 - User name for mysql
@@ -54,5 +54,5 @@
     ^test.testtab("TEST4","col1")=3.8937
                           "col2")=1.0071
 
- IMPORTANT - The utility will abort if there is no primary key assigned to any columns in the table as the primary key will be translated to the primary key for the global
+ IMPORTANT - The utility will abort if there is no primary key assigned to any columns in the table as the primary key will be translated to the primary subscript for the global
        
